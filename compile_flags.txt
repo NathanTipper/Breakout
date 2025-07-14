@@ -1,0 +1,2 @@
+-I.\include\
+-DPLATFORM_WIN32=1
