@@ -27,8 +27,6 @@ struct Game
 
     std::vector<game_level> levels;
     unsigned int currentLevel;
-
-    Texture2D background;
 };
 
 void game_initialize(Game* g, unsigned int width, unsigned int height);

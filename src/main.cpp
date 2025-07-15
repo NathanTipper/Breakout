@@ -57,10 +57,6 @@ typedef float real32;
 #define Assert(Expression) if(!(Expression)) {*(int *)0 = 0;}
 
 Game Breakout;
-typedef bool (check_state_func)();
-
-check_state_func IsComplete;
-#define LEVEL_COMPLETE_FUNC(lvl_name) bool lvl_name
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -128,7 +124,7 @@ int main(void)
     shader_set_matrix(&sprite_sp, (char*)"projection", glm::value_ptr(projection));
 
     game_set_sprite_shader(&Breakout, &sprite_sp);
-    game_add_sprite(&Breakout, "face", glm::vec2(200.f, 200.f), glm::vec2(300.f, 400.f), glm::vec3(0.f, 1.f, 0.f), 45.f);
+    game_add_sprite(&Breakout, "face", glm::vec2(200.f, 200.f), glm::vec2(300.f, 400.f), glm::vec3(1.f, 1.f, 1.f), 45.f);
     float deltaTime = 0.f;
     float lastFrame = 0.f;
     float currentFrame = 0.f;

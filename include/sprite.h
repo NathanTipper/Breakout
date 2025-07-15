@@ -12,11 +12,9 @@ struct Sprite
   glm::vec2 size;
   glm::vec3 color;
   float rotation;
-
-  unsigned int VAO;
-  unsigned int VBO;
 };
 
-void sprite_generate_render_data(Sprite* sprite);
+void sprite_generate_render_data();
 void sprite_draw(Sprite* sprites, int count, ShaderProgram* sp);
+void sprite_print(const Sprite* sprite);
 #endif

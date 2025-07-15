@@ -75,15 +75,7 @@ void shader_set_int(ShaderProgram* sp, char* name, int value)
 void shader_set_matrix(ShaderProgram *sp, char *name, float* value)
 {
     unsigned int uniformLocation = glGetUniformLocation(sp->id, name);
-
-    if(uniformLocation)
-    {
-        glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value);
-    }
-    else
-    {
-        std::cout << "Could not find uniform location" << std::endl;
-    }
+    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value);
 }
 
 void shader_set_vec3(ShaderProgram *sp, char *name, float v0, float v1, float v2)

@@ -56,7 +56,7 @@ void level_init(game_level *level, std::vector<std::vector<unsigned int>> tileDa
             obj.size = glm::vec2(unit_width, unit_height);
             if(tileData[y][x] == 1)
             {
-                obj.sprite = ResourceManager::GetTexture("block_solid");
+                obj.textureName = "block_solid";
                 obj.color = glm::vec3(0.8f, 0.8f, 0.7f);
             }
             else if(tileData[y][x] > 1)
@@ -79,7 +79,7 @@ void level_init(game_level *level, std::vector<std::vector<unsigned int>> tileDa
                     color = glm::vec3(1.f, 0.5f, 0.f);
                 }
 
-                obj.sprite = ResourceManager::GetTexture("block");
+                obj.textureName = "block";
             }
 
             level->bricks.push_back(obj);

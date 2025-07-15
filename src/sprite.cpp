@@ -8,14 +8,9 @@
 #include "glad/glad.h"
 #include <iostream>
 
-void sprite_generate_render_data(Sprite* sprite)
+unsigned int SpriteRenderingVAO;
+void sprite_generate_render_data()
 {
-    if(!sprite)
-    {
-        std::cout << "SPRITE::GENERATE_RENDER_DATA : Invalid Sprite was given" << std::endl;
-        return;
-    }
-
     float vertices[] = {
         0.f, 1.f,   0.f, 1.f,
         1.f, 0.f,   1.f, 0.f,
@@ -26,13 +21,15 @@ void sprite_generate_render_data(Sprite* sprite)
         1.f, 0.f,   1.f, 0.f
     };
 
-    glGenVertexArrays(1, &sprite->VAO);
-    glGenBuffers(1, &sprite->VBO);
+    glGenVertexArrays(1, &SpriteRenderingVAO);
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
+    glBindVertexArray(SpriteRenderingVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(sprite->VAO);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 
@@ -56,10 +53,13 @@ void sprite_draw(Sprite* sprites, int count, ShaderProgram* sp)
 
     shader_use(sp);
 
-    glm::mat4 model = glm::mat4(1.f);
 
+    glm::mat4 model;
+    glBindVertexArray(SpriteRenderingVAO);
+    glActiveTexture(GL_TEXTURE0);
     for(int i = 0; i < count; ++i)
     {
+        model = glm::mat4(1.f);
         model = glm::translate(model, glm::vec3(sprites[i].position, 0.f));
 
         model = glm::translate(model, glm::vec3(0.5f * sprites[i].size.x, 0.5f * sprites[i].size.y, 0.f));
@@ -71,14 +71,19 @@ void sprite_draw(Sprite* sprites, int count, ShaderProgram* sp)
         shader_set_matrix(sp, (char*)"model", glm::value_ptr(model));
         shader_set_vec3(sp, (char*)"spriteColor", sprites[i].color.x, sprites[i].color.y, sprites[i].color.z);
 
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sprites[i].texture.id);
 
-        glBindVertexArray(sprites[i].VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
-    glUseProgram(0);
+}
+
+void sprite_print(const Sprite* sprite)
+{
+    std::cout << "Sprite: " << std::endl 
+        << "\tPosition = { " << sprite->position.x << " " << sprite->position.y << " }" << std::endl
+        << "\tSize = { " << sprite->size.x << " " << sprite->size.y << " }" << std::endl
+        << "\tColor = { " << sprite->color.x << " " << sprite->color.y << " " << sprite->color.z << " }" << std::endl
+        << "\tTexture = { " << sprite->texture.id << " }" << std::endl;
 }

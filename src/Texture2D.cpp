@@ -50,6 +50,11 @@ Texture2D texture2D_load_from_file(const char *filename)
             Result.image_format = GL_RGBA;
             Result.internal_format = GL_RGBA;
         }
+        else 
+        {
+            Result.image_format = GL_RGB;
+            Result.internal_format = GL_RGB;
+        }
 
         Result.width = width;
         Result.height = height;
@@ -59,7 +64,6 @@ Texture2D texture2D_load_from_file(const char *filename)
         Result.filter_max = GL_LINEAR;
 
         generate_Texture2D(&Result, data);
-        std::cout << "Loaded texture successfully!" << std::endl;
 
         stbi_image_free(data);
     }

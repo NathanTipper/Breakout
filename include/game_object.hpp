@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 
 #include "Texture2D.h"
+#include <string>
 
 struct GameObject 
 {
@@ -14,6 +15,6 @@ struct GameObject
     bool isSolid;
     bool isDestroyed;
 
-    Texture2D sprite;
+    std::string textureName;
 };
 #endif
