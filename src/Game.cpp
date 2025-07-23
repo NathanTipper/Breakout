@@ -1,9 +1,25 @@
 #include "Game.hpp"
 #include "ResourceManager/ResourceManager.hpp"
 #include "Texture2D.h"
-#include "game_level.hpp"
-#include "sprite.h"
 #include <string>
+
+void Game::Game()
+{ }
+
+void Game::Game(unsigned int width, unsigned int height)
+{
+    m_state = GameState::GAME_ACTIVE;
+    m_width = width;
+    m_height = height;
+
+    ResourceManager::LoadTexture("../data/block.png", false, "block");
+    ResourceManager::LoadTexture("../data/block_solid.png", false, "block_solid");
+    ResourceManager::LoadTexture("../data/background.jpg", false, "background");
+    ResourceManager::LoadTexture("../data/awesomeface.png", false, "face");
+
+    GameLevel lvl1;
+
+}
 
 void game_initialize(Game* g, unsigned int width, unsigned int height)
 {
@@ -19,10 +35,6 @@ void game_initialize(Game* g, unsigned int width, unsigned int height)
 
     sprite_generate_render_data();
 
-    ResourceManager::LoadTexture("../data/block.png", false, "block");
-    ResourceManager::LoadTexture("../data/block_solid.png", false, "block_solid");
-    ResourceManager::LoadTexture("../data/background.jpg", false, "background");
-    ResourceManager::LoadTexture("../data/awesomeface.png", false, "face");
 
     game_add_sprite(g, "background", glm::vec2(0.f, 0.f), glm::vec2(width, height), glm::vec3(1.f), 0.f);
     g->levels.push_back(level_load((char*)("../data/levels/two.lvl"), g->width, g->height / 2));

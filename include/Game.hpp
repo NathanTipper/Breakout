@@ -2,9 +2,9 @@
 #define GAME_H
 
 #include "Texture2D.h"
-#include "game_level.hpp"
+#include "GameLevel.hpp"
 #include "glm/glm.hpp"
-#include "shader.h"
+#include "Shader.hpp"
 #include "sprite.h"
 #include <string>
 enum GameState
@@ -15,18 +15,22 @@ enum GameState
 };
 
 #define MAX_SPRITES 100
-struct Game
+class Game
 {
-    GameState state;
-    bool keys[1024];
-    unsigned int width, height;
+public:
+    Game();
+    Game(unsigned int width, unsigned int height);
+    void ProcessInput(float dt);
+    void Update(float dt);
+    void Render(float dt);
 
-    ShaderProgram *sprite_shader;
-    Sprite sprites[MAX_SPRITES];
-    unsigned int sprite_count;
+private:
+    GameState m_state;
+    bool m_keys[1024];
+    unsigned int m_width, m_height;
 
-    std::vector<game_level> levels;
-    unsigned int currentLevel;
+    std::vector<GameLevel> m_levels;
+    unsigned int m_currentLevel;
 };
 
 void game_initialize(Game* g, unsigned int width, unsigned int height);
