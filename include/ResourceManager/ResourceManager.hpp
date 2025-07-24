@@ -1,7 +1,7 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 #include "Texture2D.h"
-#include "shader.h"
+#include "Shader.hpp"
 #include <map>
 #include <string>
 class ResourceManager

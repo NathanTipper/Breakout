@@ -1,5 +1,5 @@
 #include "SpriteRenderer/SpriteRenderer.hpp"
-#include "glad/glad.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 void SpriteRenderer::initRenderData()
 {
@@ -31,7 +31,6 @@ void SpriteRenderer::initRenderData()
 
 void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotation, glm::vec3 color)
 {
-    shader_use(&m_shader);
 
     glm::mat4 model;
     glBindVertexArray(m_quadVAO);
@@ -45,9 +44,6 @@ void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec
     model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.f));
 
     model = glm::scale(model, glm::vec3(size, 1.f));
-
-    shader_set_matrix(sp, (char*)"model", glm::value_ptr(model));
-    shader_set_vec3(sp, (char*)"spriteColor", color.x, color.y, color.z);
 
     glBindTexture(GL_TEXTURE_2D, texture.id);
 

@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "glm/glm.hpp"
 enum ShaderType
 {
 	SHADERTYPE_VERTEX,
@@ -25,21 +26,12 @@ public:
 
 	void SetSource(ShaderType type, const char* filename);
 	void Delete();
+
+	inline unsigned int GetID() const { return m_id; }
 private:
-	unsigned int id;
+	unsigned int m_id;
 	char shader_source[SHADERTYPE_COUNT][SHADER_SOURCE_FILENAME_SIZE];
 	unsigned int shaders[SHADERTYPE_COUNT];
 };
-
-void shader_init(ShaderProgram* sp);
-void shader_use(ShaderProgram* sp);
-bool shader_link(ShaderProgram* sp);
-void shader_set_int(ShaderProgram* sp, char* name, int value);
-void shader_set_float(ShaderProgram* sp, char* name, float value);
-void shader_set_source(ShaderProgram* sp, ShaderType st, const char *filename);
-void shader_set_matrix(ShaderProgram* sp, char* name, float* value);
-void shader_set_vec3(ShaderProgram* sp, char* name, float v0, float v1, float v2);
-bool shader_load(ShaderProgram* sp);
-void shader_delete(ShaderProgram* sp);
 
 #endif

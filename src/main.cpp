@@ -6,38 +6,13 @@
 #include <string>
 #include <glad/glad.h>
 #include <glfw3.h>
-#include "Game.hpp"
-#include "Texture2D.h"
-#include "assimp/material.h"
-#include "glm/detail/qualifier.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/quaternion_geometric.hpp"
-#include "glm/ext/vector_float2.hpp"
-#include "glm/ext/vector_float3.hpp"
-#include "glm/geometric.hpp"
-#include "glm/matrix.hpp"
-#include "glm/trigonometric.hpp"
-#include "shader.h"
-
-
-#include "utils.h"
-
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-
+#include "Game.hpp"
+#include "Shader.hpp"
+#include "utils.h"
 #include "nmath.h"
-
-// Model loading using assimp
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
 #include <vector>
 #include <stdint.h>
-#include "sprite.h"
 
 typedef unsigned int uint;
 typedef uint64_t uint64;
@@ -73,7 +48,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if(key >= 0 && key < 1024)
     {
-        Breakout.keys[key] = action;
     }
 }
 
@@ -98,19 +72,6 @@ int main(void)
         return -1;
     }
 
-    game_initialize(&Breakout, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    ShaderProgram sprite_sp;
-    shader_init(&sprite_sp);
-    shader_set_source(&sprite_sp, SHADERTYPE_VERTEX, (char*)"..\\shaders\\shader.vert");
-    shader_set_source(&sprite_sp, SHADERTYPE_FRAGMENT, (char*)"..\\shaders\\shader.frag");
-    shader_load(&sprite_sp);
-    if(!shader_link(&sprite_sp))
-    {
-        return 0;
-    }
-    shader_use(&sprite_sp);
-
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     glEnable(GL_BLEND);
@@ -119,15 +80,11 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    glm::mat4 projection = glm::ortho(0.f, 800.f, 600.f, 0.f, -1.f, 1.f);
-    shader_set_int(&sprite_sp, (char*)"image", 0);
-    shader_set_matrix(&sprite_sp, (char*)"projection", glm::value_ptr(projection));
-
-    game_set_sprite_shader(&Breakout, &sprite_sp);
-    game_add_sprite(&Breakout, "face", glm::vec2(200.f, 200.f), glm::vec2(300.f, 400.f), glm::vec3(1.f, 1.f, 1.f), 45.f);
     float deltaTime = 0.f;
     float lastFrame = 0.f;
     float currentFrame = 0.f;
+
+    Breakout.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -136,14 +93,10 @@ int main(void)
         lastFrame = currentFrame;
         glfwPollEvents();
 
-        game_process_input(&Breakout, deltaTime);
-
-        game_update(&Breakout, deltaTime);
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        game_render(&Breakout);
         glfwSwapBuffers(window);
 
         lastFrame = currentFrame;

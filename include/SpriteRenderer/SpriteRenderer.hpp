@@ -2,7 +2,10 @@
 #define SPRITERENDERER_H
 #include "Texture2D.h"
 #include "Shader.hpp"
+
+#include "glad/glad.h"
 #include "glm/glm.hpp"
+
 class SpriteRenderer
 {
 public:

@@ -1,6 +1,5 @@
 #include "ResourceManager/ResourceManager.hpp"
 #include "Texture2D.h"
-#include "shader.h"
 #include <glad/glad.h>
 
 std::map<std::string, Texture2D> ResourceManager::Textures;
@@ -32,7 +31,7 @@ void ResourceManager::Clear()
 {
     for(auto iter : Shaders)
     {
-        glDeleteProgram(iter.second.id);
+        glDeleteProgram(iter.second.GetID());
     }
 
     for(auto iter : Textures)
@@ -45,14 +44,11 @@ ShaderProgram ResourceManager::loadShaderFromFile(const char *vShaderFile, const
 {
     ShaderProgram shader;
 
-    shader_init(&shader);
-    shader_set_source(&shader, SHADERTYPE_VERTEX, vShaderFile);
-    shader_set_source(&shader, SHADERTYPE_FRAGMENT, fShaderFile);
-    shader_set_source(&shader, SHADERTYPE_GEOMETRY, gShaderFile);
+    shader.SetSource(SHADERTYPE_VERTEX, vShaderFile);
+    shader.SetSource(SHADERTYPE_FRAGMENT, fShaderFile);
+    shader.SetSource(SHADERTYPE_GEOMETRY, gShaderFile);
 
-    shader_link(&shader);
-    shader_load(&shader);
-
+    shader.Compile();
     return shader;
 }
 

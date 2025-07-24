@@ -1,11 +1,12 @@
 #include "Shader.hpp"
 #include <glad/glad.h>
 #include <cstdio>
+#include <iostream>
 #include "utils.h"
 
 ShaderProgram::ShaderProgram()
 {
-    id = glCreateProgram();
+    m_id = glCreateProgram();
     for(int i = 0; i < SHADERTYPE_COUNT; ++i)
     {
         shaders[i] = 0;
@@ -15,7 +16,7 @@ ShaderProgram::ShaderProgram()
 
 void ShaderProgram::Use()
 {
-    glUseProgram(id);
+    glUseProgram(m_id);
 }
 
 bool ShaderProgram::Compile()
@@ -47,7 +48,7 @@ bool ShaderProgram::Compile()
                 glShaderType = GL_GEOMETRY_SHADER;
                 break;
             default:
-                printf("Could not find valid shader type");
+                printf("Could not find valm_id shader type");
                 return false;
         }
 
@@ -68,6 +69,7 @@ bool ShaderProgram::Compile()
             return false;
         }
 
+        std::cout << "Successfully compiled the " << glShaderType << "!!" << std::endl;
         shaders[i] = shader;
         win32Free(rfr.contents, rfr.filesize);
     }
@@ -76,7 +78,7 @@ bool ShaderProgram::Compile()
     {
         if(shaders[i])
         {
-            glAttachShader(id, shaders[i]);
+            glAttachShader(m_id, shaders[i]);
         }
         else
         {
@@ -88,13 +90,13 @@ bool ShaderProgram::Compile()
         }
     }
 
-    glLinkProgram(id);
+    glLinkProgram(m_id);
     int success;
     char infoLog[512];
-    glGetProgramiv(id, GL_LINK_STATUS, &success);
+    glGetProgramiv(m_id, GL_LINK_STATUS, &success);
     if(!success)
     {
-        glGetProgramInfoLog(id, 512, NULL, infoLog);
+        glGetProgramInfoLog(m_id, 512, NULL, infoLog);
         printf("Shader Program linking failed: %s\n", infoLog);
         return false;
     }
@@ -107,34 +109,42 @@ bool ShaderProgram::Compile()
             shaders[i] = 0;
         }
     }
+
+    std::cout << "Succesful compile of shader" << std::endl;
+    return true;
 }
 
 void ShaderProgram::SetFloat(const char* name, const float value)
 {
-    unsigned int uniformLocation = glGetUniformLocation(id, name);
+    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
     glUniform1f(uniformLocation, value);
 }
 
 void ShaderProgram::SetInt(const char* name, const int value)
 {
-    unsigned int uniformLocation = glGetUniformLocation(id, name);
+    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
     glUniform1i(uniformLocation, value);
 }
 
 void ShaderProgram::SetMatrix(const char* name, const float* value)
 {
-    unsigned int uniformLocation = glGetUniformLocation(id, name);
+    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
     glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value);
 }
 
 void ShaderProgram::SetVec3(const char* name, const glm::vec3 value)
 {
-    unsigned int uniformLocation = glGetUniformLocation(id, name);
+    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
     glUniform3f(uniformLocation, value.x, value.y, value.z);
 }
 
 void ShaderProgram::SetSource(ShaderType type, const char* filename)
 {
+    if(!filename)
+    {
+        return;
+    }
+
     char const *c = filename;
     int stringIndex = 0;
     while(*c != 0)
@@ -156,5 +166,5 @@ void ShaderProgram::SetSource(ShaderType type, const char* filename)
 
 void ShaderProgram::Delete()
 {
-    glDeleteProgram(id);
+    glDeleteProgram(m_id);
 }
