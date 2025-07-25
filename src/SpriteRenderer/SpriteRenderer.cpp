@@ -1,7 +1,10 @@
 #include "SpriteRenderer/SpriteRenderer.hpp"
+#include "ResourceManager/ResourceManager.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "GameObject.hpp"
 
-void SpriteRenderer::initRenderData()
+void SpriteRenderer::Init()
 {
     float vertices[] = {
         0.f, 1.f,   0.f, 1.f,
@@ -29,9 +32,10 @@ void SpriteRenderer::initRenderData()
     glBindVertexArray(0);
 }
 
-void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotation, glm::vec3 color)
+void SpriteRenderer::DrawSprite(const Texture2D& texture, glm::vec2 position, 
+                                glm::vec2 size, float rotation, glm::vec3 color) const
 {
-
+    m_shader.Use();
     glm::mat4 model;
     glBindVertexArray(m_quadVAO);
     glActiveTexture(GL_TEXTURE0);
@@ -45,9 +49,29 @@ void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec
 
     model = glm::scale(model, glm::vec3(size, 1.f));
 
+    m_shader.SetMatrix("model", glm::value_ptr(model));
+    m_shader.SetVec3("spriteColor", color);
     glBindTexture(GL_TEXTURE_2D, texture.id);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
+}
+
+void SpriteRenderer::DrawSprite(const GameObject& object)
+{
+    DrawSprite(object.GetTexture(), object.GetPosition(), object.GetSize(), object.GetRotation(), object.GetColor());
+}
+
+void SpriteRenderer::SetShader(std::string name)
+{
+    m_shader = ResourceManager::GetShader(name);
+}
+
+void SpriteRenderer::DrawSprite(GameObject* object)
+{
+    if(object)
+    {
+        DrawSprite(*object);
+    }
 }

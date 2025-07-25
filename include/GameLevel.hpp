@@ -3,16 +3,19 @@
 
 #include <vector>
 #include "GameObject.hpp"
+
+class SpriteRenderer;
+
 class GameLevel 
 {
 public:
     GameLevel() { }
-    GameLevel(char* file, unsigned int levelWidth, unsigned int levelHeight);
     void Init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight);
-    void Load(char* file, unsigned int levelWidth, unsigned int levelHeight);
+    void Draw(const SpriteRenderer& renderer);
     bool IsComplete();
-private:
+
     std::vector<GameObject> bricks;
+    static GameLevel Load(char* file, unsigned int levelWidth, unsigned int levelHeight);
 };
 
 #endif

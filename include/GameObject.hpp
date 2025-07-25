@@ -11,9 +11,9 @@ class GameObject
 {
 public:
 	GameObject();
-	GameObject(glm::vec2 position, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f), 
-				glm::vec2 velocity = glm::vec2(0.0f, 0.0f));
-	virtual void Draw(SpriteRenderer* renderer);
+	GameObject(glm::vec2 position, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f),
+				float rotation = 0.f, glm::vec2 velocity = glm::vec2(0.0f, 0.0f));
+	virtual void Draw(const SpriteRenderer& renderer);
 
 	inline glm::vec2 GetPosition() const { return m_position; }
 	inline void SetPosition(const glm::vec2 newPosition) { m_position = newPosition; }
@@ -33,12 +33,12 @@ public:
 	inline Texture2D GetTexture() const { return m_texture; }
 	inline void SetTexture(const Texture2D newTexture) { m_texture = newTexture; }
 
-	inline float IsSolid() const { return m_isSolid; }
-	inline void SetIsSolid(const float newIsSolid) { m_isSolid = newIsSolid; }
+	inline bool IsSolid() const { return m_isSolid; }
+	inline void SetIsSolid(const bool newIsSolid) { m_isSolid = newIsSolid; }
 	
-	inline float IsDestroyed() const { return m_isDestroyed; }
-	inline void SetIsDestroyed(const float newIsDestroyed) { m_isDestroyed = newIsDestroyed; }
-private:
+	inline bool IsDestroyed() const { return m_isDestroyed; }
+	inline void SetIsDestroyed(const bool newIsDestroyed) { m_isDestroyed = newIsDestroyed; }
+protected:
 	glm::vec2 m_position, m_size, m_velocity;
 	glm::vec3 m_color;
 	float m_rotation;

@@ -6,6 +6,10 @@
 
 ShaderProgram::ShaderProgram()
 {
+}
+
+void ShaderProgram::Init()
+{
     m_id = glCreateProgram();
     for(int i = 0; i < SHADERTYPE_COUNT; ++i)
     {
@@ -14,7 +18,7 @@ ShaderProgram::ShaderProgram()
     }
 }
 
-void ShaderProgram::Use()
+void ShaderProgram::Use() const
 {
     glUseProgram(m_id);
 }
@@ -69,7 +73,6 @@ bool ShaderProgram::Compile()
             return false;
         }
 
-        std::cout << "Successfully compiled the " << glShaderType << "!!" << std::endl;
         shaders[i] = shader;
         win32Free(rfr.contents, rfr.filesize);
     }
@@ -110,31 +113,30 @@ bool ShaderProgram::Compile()
         }
     }
 
-    std::cout << "Succesful compile of shader" << std::endl;
     return true;
 }
 
-void ShaderProgram::SetFloat(const char* name, const float value)
+void ShaderProgram::SetFloat(const char* name, const float value) const
 {
-    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
+    unsigned int uniformLocation = GetUniformLocation(name);
     glUniform1f(uniformLocation, value);
 }
 
-void ShaderProgram::SetInt(const char* name, const int value)
+void ShaderProgram::SetInt(const char* name, const int value) const
 {
-    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
+    unsigned int uniformLocation = GetUniformLocation(name);
     glUniform1i(uniformLocation, value);
 }
 
-void ShaderProgram::SetMatrix(const char* name, const float* value)
+void ShaderProgram::SetMatrix(const char* name, const float* value) const
 {
-    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
+    unsigned int uniformLocation = GetUniformLocation(name);
     glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value);
 }
 
-void ShaderProgram::SetVec3(const char* name, const glm::vec3 value)
+void ShaderProgram::SetVec3(const char* name, const glm::vec3 value) const
 {
-    unsigned int uniformLocation = glGetUniformLocation(m_id, name);
+    unsigned int uniformLocation = GetUniformLocation(name);
     glUniform3f(uniformLocation, value.x, value.y, value.z);
 }
 
@@ -164,7 +166,18 @@ void ShaderProgram::SetSource(ShaderType type, const char* filename)
     shader_source[type][stringIndex] = '\0';
 }
 
-void ShaderProgram::Delete()
+void ShaderProgram::Delete() const
 {
     glDeleteProgram(m_id);
+}
+
+unsigned int ShaderProgram::GetUniformLocation(const char* name) const
+{
+    unsigned int Result = glGetUniformLocation(m_id, name);
+    if(Result < 0)
+    {
+        std::cout << "ShaderProgram::GetUniformLocation : Could not find uniform with name " << name << std::endl;
+    }
+
+    return Result;
 }

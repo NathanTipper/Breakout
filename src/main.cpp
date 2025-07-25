@@ -46,9 +46,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         glfwSetWindowShouldClose(window, 1);
     }
-    if(key >= 0 && key < 1024)
-    {
-    }
+
+    Breakout.SetKey(key, action);
 }
 
 int main(void)
@@ -92,11 +91,13 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         glfwPollEvents();
+        Breakout.ProcessInput(deltaTime);
 
-
+        Breakout.Update(deltaTime);
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        Breakout.Render(deltaTime);
         glfwSwapBuffers(window);
 
         lastFrame = currentFrame;
@@ -105,97 +106,3 @@ int main(void)
     glfwTerminate();
     return 0;
 }
-
-// TODO: Keeping this code in case I want to re-visit math stuff in OpenGL
-    // TESTS
-#if TESTS_ENABLED
-    printf("\n***** TESTS *****\n");
-    Vector2D testVector = {3, 4};
-    float test_length = Length(testVector);
-    printf("\nLength of vector { %.2f, %.2f } = %.2f\n", testVector.x, testVector.y, test_length);
-
-    Vector2D testVectorB = { 4.f, 8.f };
-    float test_dot = Dot_2D(testVector, testVectorB);
-    printf("\n{ %.2f, %.2f } dot { %.2f, %.2f } = %.2f\n", 
-           testVector.x, testVector.y, 
-           testVectorB.x, testVectorB.y,
-           test_dot);
-
-    Vector2D testVectorC = testVector - testVectorB;
-    printf("\nResult of vector { %.2f, %.2f } - { %.2f, %.2f } = { %.2f, %.2f }\n", 
-           testVector.x, testVector.y, 
-           testVectorB.x, testVectorB.y,
-           testVectorC.x, testVectorC.y) ;
-
-    testVectorC = testVector + testVectorB;
-    printf("\nResult of vector { %.2f, %.2f } + { %.2f, %.2f } = { %.2f, %.2f }\n", 
-           testVector.x, testVector.y, 
-           testVectorB.x, testVectorB.y,
-           testVectorC.x, testVectorC.y) ;
-
-    Vector2D testVectorD = { 1.f, 0.f };
-    Vector2D testVectorE = { 0.70710f, 0.70710f };
-    printf("\ncos of vectors { %.2f, %.2f } & { %.2f, %.2f } = %.2f\n",
-           testVectorD.x, testVectorD.y, 
-           testVectorE.x, testVectorE.y,
-           ncos(testVectorD, testVectorE)) ;
-
-    printf("\n**** END TESTS *****\n");
-    Vector2D pos = { -3, 4 };
-    Vector2D forward = { 5, -2 };
-
-    float points[] = {
-        0.f, 0.f, 0.f,
-        1.f, 6.f, 0.f,
-        -6.f, 0.f, 0.f,
-        -4.f, 7.f, 0.f,
-        5.f, 5.f, 0.f,
-        -3.f, 0.f, 0.f,
-        -6.f, -3.5f, 0.f
-    };
-
-#define NUMBER_OF_VECTORS 7
-    float posToPointVectors[NUMBER_OF_VECTORS * 2];
-    for(int i = 0; i < NUMBER_OF_VECTORS; ++i)
-    {
-        Vector2D currentPoint = { points[i * 3], points[(i * 3) + 1] };
-        Vector2D posToPointVec = currentPoint - pos;
-        posToPointVectors[i * 3] = posToPointVec.x / 800.f;
-        posToPointVectors[i * 3 + 1] = posToPointVec.y / 600.f;
-        posToPointVectors[i * 3 + 2] = 0.f;
-        points[i * 3] = points[i * 3] / 800.f;
-        points[i * 3 + 1] = points[i * 3 + 1] / 600.f;
-    }
-
-    int is_in_front[NUMBER_OF_VECTORS];
-    for(int i = 0; i < NUMBER_OF_VECTORS; ++i)
-    {
-        is_in_front[i] = Dot_2D(forward, { posToPointVectors[i * 3], posToPointVectors[i * 3 + 1] }) > 0.f;
-    }
-
-    uint PointsArray, PointsBuffer;
-    glGenVertexArrays(1, &PointsArray);
-    glGenBuffers(1, &PointsBuffer);
-
-    glBindVertexArray(PointsArray);
-    glBindBuffer(GL_ARRAY_BUFFER, PointsBuffer);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    uint VectorArray, VectorBuffer;
-    glGenVertexArrays(1, &VectorArray);
-    glGenBuffers(1, &VectorBuffer);
-
-    glBindVertexArray(VectorArray);
-    glBindBuffer(GL_ARRAY_BUFFER, VectorBuffer);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(posToPointVectors), posToPointVectors, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif

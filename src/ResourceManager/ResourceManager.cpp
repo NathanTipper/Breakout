@@ -44,6 +44,7 @@ ShaderProgram ResourceManager::loadShaderFromFile(const char *vShaderFile, const
 {
     ShaderProgram shader;
 
+    shader.Init();
     shader.SetSource(SHADERTYPE_VERTEX, vShaderFile);
     shader.SetSource(SHADERTYPE_FRAGMENT, fShaderFile);
     shader.SetSource(SHADERTYPE_GEOMETRY, gShaderFile);

@@ -1,13 +1,11 @@
 #include "GameLevel.hpp"
+#include "GameObject.hpp"
 #include "ResourceManager/ResourceManager.hpp"
+#include "SpriteRenderer/SpriteRenderer.hpp"
 #include <fstream>
 #include <sstream>
 #include <string>
-
-GameLevel::GameLevel(char* file, unsigned int width, unsigned int height)
-{
-    Load(file, width, height);
-}
+#include <iostream>
 
 void GameLevel::Init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight)
 {
@@ -21,15 +19,17 @@ void GameLevel::Init(std::vector<std::vector<unsigned int>> tileData, unsigned i
     {
         for(unsigned int x = 0; x < width; ++x)
         {
-            GameObject obj;
-            glm::vec2 position = glm::vec2(unit_width * x, unit_height * y);
-            glm::vec2 size = glm::vec2(unit_width, unit_height);
+            GameObject brick;
+            brick.SetPosition(glm::vec2(unit_width * x, unit_height * y));
+            brick.SetSize(glm::vec2(unit_width, unit_height));
+            brick.SetIsDestroyed(false);
             glm::vec3 color = glm::vec3(1.f);
             Texture2D texture;
             if(tileData[y][x] == 1)
             {
                 texture = ResourceManager::GetTexture("block_solid");
                 color = glm::vec3(0.8f, 0.8f, 0.7f);
+                brick.SetIsSolid(true);
             }
             else if(tileData[y][x] > 1)
             {
@@ -54,13 +54,17 @@ void GameLevel::Init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 texture = ResourceManager::GetTexture("block");
             }
 
-            bricks.emplace_back(position, size, texture, color);
+            brick.SetColor(color);
+            brick.SetTexture(texture);
+
+            bricks.push_back(brick);
         }
     }
 }
 
-void GameLevel::Load(char* file, unsigned int levelWidth, unsigned int levelHeight)
+GameLevel GameLevel::Load(char* file, unsigned int levelWidth, unsigned int levelHeight)
 {
+    GameLevel Result;
     unsigned int tileCode;
     std::string line;
     std::ifstream fstream(file);
@@ -81,7 +85,20 @@ void GameLevel::Load(char* file, unsigned int levelWidth, unsigned int levelHeig
 
         if(tileData.size() > 0)
         {
-            Init(tileData, levelWidth, levelHeight);
+            Result.Init(tileData, levelWidth, levelHeight);
+        }
+    }
+
+    return Result;
+}
+
+void GameLevel::Draw(const SpriteRenderer& renderer)
+{
+    for(GameObject& brick : bricks)
+    {
+        if(!brick.IsDestroyed())
+        {
+            brick.Draw(renderer);
         }
     }
 }
