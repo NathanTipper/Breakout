@@ -4,6 +4,8 @@
 #include "GameObject.hpp"
 #include "GameLevel.hpp"
 #include "Ball.hpp"
+#include "ParticleGenerator.hpp"
+#include "PostProcessor.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 
 #define NUM_KEY_INPUTS 1024
@@ -55,12 +57,15 @@ private:
 
     GameState m_state;
     SpriteRenderer m_renderer;
+    ParticleGenerator m_particleGenerator;
+    PostProcessor m_postProcessor;
     bool m_isInitialized = false;
     bool m_keys[NUM_KEY_INPUTS];
     unsigned int m_width, m_height;
     float m_playerVelocity;
     GameObject m_player;
     Ball m_ball;
+    float m_shakeTime;
 
     glm::vec2 m_playerStartPos;
     glm::vec2 m_ballStartPos;

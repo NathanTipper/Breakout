@@ -134,10 +134,22 @@ void ShaderProgram::SetMatrix(const char* name, const float* value) const
     glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value);
 }
 
+void ShaderProgram::SetVec2(const char* name, const glm::vec2 value) const
+{
+    unsigned int uniformLocation = GetUniformLocation(name);
+    glUniform2f(uniformLocation, value.x, value.y);
+}
+
 void ShaderProgram::SetVec3(const char* name, const glm::vec3 value) const
 {
     unsigned int uniformLocation = GetUniformLocation(name);
     glUniform3f(uniformLocation, value.x, value.y, value.z);
+}
+
+void ShaderProgram::SetVec4(const char* name, const glm::vec4 value) const
+{
+    unsigned int uniformLocation = GetUniformLocation(name);
+    glUniform4f(uniformLocation, value.x, value.y, value.z, value.w);
 }
 
 void ShaderProgram::SetSource(ShaderType type, const char* filename)
@@ -181,3 +193,4 @@ unsigned int ShaderProgram::GetUniformLocation(const char* name) const
 
     return Result;
 }
+

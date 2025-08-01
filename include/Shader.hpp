@@ -23,7 +23,9 @@ public:
 	void SetFloat(const char* name, const float value) const;
 	void SetInt(const char* name, const int value) const;
 	void SetMatrix(const char* name, const float* value) const;
+	void SetVec2(const char* name, const glm::vec2 value) const;
 	void SetVec3(const char* name, const glm::vec3 value) const;
+	void SetVec4(const char* name, const glm::vec4 value) const;
 
 	void SetSource(ShaderType type, const char* filename);
 	void Delete() const;

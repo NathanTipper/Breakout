@@ -51,7 +51,7 @@ void SpriteRenderer::DrawSprite(const Texture2D& texture, glm::vec2 position,
 
     m_shader.SetMatrix("model", glm::value_ptr(model));
     m_shader.SetVec3("spriteColor", color);
-    glBindTexture(GL_TEXTURE_2D, texture.id);
+    texture.Bind();
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -2,6 +2,11 @@
 #include "Texture2D.h"
 #include <glad/glad.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#include <iostream>
+
 std::map<std::string, Texture2D> ResourceManager::Textures;
 std::map<std::string, ShaderProgram> ResourceManager::Shaders;
 
@@ -36,7 +41,8 @@ void ResourceManager::Clear()
 
     for(auto iter : Textures)
     {
-        glDeleteTextures(1, &iter.second.id);
+        unsigned int textureId = iter.second.GetId();
+        glDeleteTextures(1, &textureId);
     }
 }
 
@@ -53,7 +59,46 @@ ShaderProgram ResourceManager::loadShaderFromFile(const char *vShaderFile, const
     return shader;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
+Texture2D ResourceManager::loadTextureFromFile(const char *filename, bool alpha)
 {
-    return texture2D_load_from_file(file);
+    Texture2D Result;
+
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(filename , &width, &height, &nrChannels, 0);
+
+    if(data)
+    {
+        if(alpha)
+        {
+            Result.SetImageFormat(GL_RGBA);
+            Result.SetInternalFormat(GL_RGBA);
+        }
+        else
+        {
+            if(nrChannels == 1)
+            {
+                Result.SetImageFormat(GL_RED);
+                Result.SetInternalFormat(GL_RED);
+            }
+            else if(nrChannels == 2)
+            {
+                Result.SetImageFormat(GL_RGB);
+                Result.SetInternalFormat(GL_RGB);
+            }
+            else if(nrChannels == 4)
+            {
+                Result.SetImageFormat(GL_RGBA);
+                Result.SetInternalFormat(GL_RGBA);
+            }
+        }
+
+        Result.Generate(width, height, data);
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Could not open path: " << filename << std::endl;
+    }
+
+    return Result;
 }

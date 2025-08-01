@@ -1,5 +1,7 @@
 #include "Game.hpp"
 #include "GameObject.hpp"
+#include "ParticleGenerator.hpp"
+#include "PostProcessor.hpp"
 #include "ResourceManager/ResourceManager.hpp"
 #include "Shader.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
@@ -32,12 +34,14 @@ void Game::Init(unsigned int width, unsigned int height)
     ResourceManager::LoadTexture("../data/background.jpg", false, "background");
     ResourceManager::LoadTexture("../data/paddle.png", false, "paddle");
     ResourceManager::LoadTexture("../data/awesomeface.png", true, "face");
+    ResourceManager::LoadTexture("../data/particle.png", true, "particle");
 
     // Initialize member variables
     m_state = GameState::GAME_ACTIVE;
     m_width = width;
     m_height = height;
     m_playerVelocity = 500.f;
+    m_shakeTime = 0.f;
 
     glm::vec2 playerSize = glm::vec2(100.f, 20.f);
     m_playerStartPos = glm::vec2(m_width * 0.5f - playerSize.x * 0.5f, m_height - playerSize.y);
@@ -61,6 +65,16 @@ void Game::Init(unsigned int width, unsigned int height)
 
     m_renderer.SetShader("sprite");
 
+    ShaderProgram ball_shader = ResourceManager::LoadShader("../shaders/ball_effect.vert", "../shaders/ball_effect.frag", nullptr, "ball_effect");
+    ball_shader.Use();
+    ball_shader.SetMatrix("projection", glm::value_ptr(projection));
+    ball_shader.SetInt("sprite", 0);
+
+    m_particleGenerator.Init(ResourceManager::GetShader("ball_effect"), ResourceManager::GetTexture("particle"), 1000);
+
+    ShaderProgram post_processing_shader = ResourceManager::LoadShader("../shaders/post_processing.vert", "../shaders/post_processing.frag", nullptr, "post_processing");
+    m_postProcessor.Init(post_processing_shader, width, height);
+
     // Load Levels
     char* levelsToLoad[] = {
         (char*)"../data/levels/one.lvl",
@@ -77,6 +91,8 @@ void Game::Init(unsigned int width, unsigned int height)
     m_currentLevel = 0;
 
     m_isInitialized = true;
+
+    glUseProgram(0);
 }
 
 void Game::ProcessInput(float dt)
@@ -125,21 +141,35 @@ void Game::ProcessInput(float dt)
 
 void Game::Render(float dt)
 {
+    m_postProcessor.BeginRender();
     m_renderer.DrawSprite(ResourceManager::GetTexture("background"), 
                             glm::vec2(0.f, 0.f), glm::vec2(m_width, m_height));
     m_levels[m_currentLevel].Draw(m_renderer);
     m_renderer.DrawSprite(m_player);
+    m_particleGenerator.Draw();
     m_renderer.DrawSprite(static_cast<GameObject>(m_ball));
+    m_postProcessor.EndRender();
+    m_postProcessor.Render(glfwGetTime());
 }
 
 void Game::Update(float dt)
 {
     m_ball.Move(dt, m_width);
+    m_particleGenerator.Update(dt, m_ball, 2, glm::vec2(m_ball.GetRadius() * 0.5f));
+    DetectCollisions();
+
+    if(m_shakeTime > 0.f)
+    {
+        m_shakeTime -= dt;
+        if(m_shakeTime <= 0.f)
+        {
+            m_postProcessor.Shake = false;
+        }
+    }
     if(m_ball.GetPosition().y >= m_height)
     {
         Reset();
     }
-    DetectCollisions();
 }
 
 void Game::SetKey(int index, bool value)
@@ -179,6 +209,11 @@ void Game::DetectCollisions()
                 if(!brick.IsSolid())
                 {
                     brick.SetIsDestroyed(true);
+                }
+                else
+                {
+                    m_postProcessor.Shake = true;
+                    m_shakeTime = 0.05f;
                 }
 
                 if(crd.direction == LEFT || crd.direction == RIGHT)

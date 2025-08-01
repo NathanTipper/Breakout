@@ -2,83 +2,35 @@
 #include "glad/glad.h"
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-void generate_Texture2D(Texture2D *texture, unsigned char *data)
+Texture2D::Texture2D()
+    : m_width(0)
+    , m_height(0)
+    , m_internalFormat(GL_RGB)
+    , m_imageFormat(GL_RGB)
+    , m_wrapS(GL_REPEAT)
+    , m_wrapT(GL_REPEAT)
+    , m_filterMin(GL_LINEAR)
+    , m_filterMax(GL_LINEAR)
 {
-    if(!texture)
-    {
-        return;
-    }
+}
 
-    glGenTextures(1, &texture->id);
+void Texture2D::Generate(unsigned int width, unsigned int height, unsigned char* data)
+{
+    glGenTextures(1, &m_id);
+    glBindTexture(GL_TEXTURE_2D, m_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, width, height, 0, 
+                    m_imageFormat, GL_UNSIGNED_BYTE, data);
 
-    glBindTexture(GL_TEXTURE_2D, texture->id);
-    glTexImage2D(GL_TEXTURE_2D, 0, texture->internal_format, texture->width, texture->height, 0, 
-                    texture->image_format, GL_UNSIGNED_BYTE, data);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrap_s);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrap_t);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filter_min);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filter_max);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_filterMin);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_filterMax);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture2D texture2D_load_from_file(const char *filename)
+void Texture2D::Bind() const
 {
-    Texture2D Result;
-
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
-
-    if(data)
-    {
-        if(nrChannels == 1)
-        {
-            Result.image_format = GL_RED;
-            Result.internal_format = GL_RED;
-        }
-        else if(nrChannels == 2)
-        {
-            Result.image_format = GL_RGB;
-            Result.internal_format = GL_RGB;
-        }
-        else if(nrChannels == 4)
-        {
-            Result.image_format = GL_RGBA;
-            Result.internal_format = GL_RGBA;
-        }
-        else 
-        {
-            Result.image_format = GL_RGB;
-            Result.internal_format = GL_RGB;
-        }
-
-        Result.width = width;
-        Result.height = height;
-        Result.wrap_s = GL_REPEAT;
-        Result.wrap_t = GL_REPEAT;
-        Result.filter_min = GL_LINEAR;
-        Result.filter_max = GL_LINEAR;
-
-        generate_Texture2D(&Result, data);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Could not open path: " << filename << std::endl;
-    }
-
-    return Result;
-}
-
-void bind_Texture2D(Texture2D *texture)
-{
-    if(texture)
-    {
-        glBindTexture(GL_TEXTURE_2D, texture->id);
-    }
+    glBindTexture(GL_TEXTURE_2D, m_id);
 }
